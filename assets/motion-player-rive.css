@@ -1,0 +1,10 @@
+.wp-block-motion-player-rive-player .motion-player-rive {
+	width: 100%;
+}
+
+.wp-block-motion-player-rive-player .motion-player-rive__canvas {
+	display: block;
+	width: 100%;
+	height: auto;
+	vertical-align: middle;
+}

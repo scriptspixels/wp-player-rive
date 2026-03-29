@@ -1,0 +1,31 @@
+.motion-player-rive-editor__empty {
+	margin: 0;
+	color: var(--wp--preset--color--contrast, #1e1e1e);
+	opacity: 0.85;
+}
+
+.motion-player-rive-editor__media {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.motion-player-rive-editor__preview-hint {
+	margin: 0 0 0.5rem;
+}
+
+.motion-player-rive-editor__note {
+	margin: 0 0 1rem;
+	font-size: 12px;
+	color: var(--wp--preset--color--contrast, #1e1e1e);
+	opacity: 0.75;
+}
+
+.motion-player-rive-editor__frame {
+	width: 100%;
+	border: 1px dashed currentColor;
+	border-radius: 2px;
+	opacity: 0.35;
+	box-sizing: border-box;
+}
