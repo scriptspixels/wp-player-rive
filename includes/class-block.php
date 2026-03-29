@@ -44,6 +44,14 @@ class Motion_Player_Rive_Block {
 			true
 		);
 
+		wp_localize_script(
+			$script_handle,
+			'motionPlayerRiveBlock',
+			array(
+				'riveRuntimeVersion' => self::RIVE_RUNTIME_VERSION,
+			)
+		);
+
 		wp_register_style(
 			'motion-player-rive-style',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/motion-player-rive.css',

@@ -1,7 +1,7 @@
 ( function( wp ) {
 	const { __ } = wp.i18n;
 	const { registerBlockType } = wp.blocks;
-	const { Fragment, createElement, useEffect } = wp.element;
+	const { Fragment, createElement, useEffect, useRef, useState } = wp.element;
 	const { InspectorControls, MediaUpload, MediaUploadCheck, useBlockProps } = wp.blockEditor;
 	const { PanelBody, Button, TextControl, RangeControl } = wp.components;
 	const { useSelect } = wp.data;
@@ -23,6 +23,161 @@
 			return true;
 		}
 		return false;
+	}
+
+	function getMediaSrc( media ) {
+		if ( ! media ) {
+			return '';
+		}
+		if ( media.source_url ) {
+			return media.source_url;
+		}
+		if ( media.url ) {
+			return media.url;
+		}
+		return '';
+	}
+
+	function getRiveRuntimeVersion() {
+		if (
+			typeof window.motionPlayerRiveBlock !== 'undefined' &&
+			window.motionPlayerRiveBlock.riveRuntimeVersion
+		) {
+			return window.motionPlayerRiveBlock.riveRuntimeVersion;
+		}
+		return '2.19.6';
+	}
+
+	function shouldAutoplayRive() {
+		if ( typeof window === 'undefined' || ! window.matchMedia ) {
+			return true;
+		}
+		return ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+	}
+
+	/** Reuse one dynamic import per runtime version when many blocks are on the canvas. */
+	const editorRiveModulePromises = new Map();
+
+	function loadEditorRiveModule( ver ) {
+		const key = ver && /^[\d.]+$/.test( String( ver ) ) ? String( ver ) : '2.19.6';
+		if ( ! editorRiveModulePromises.has( key ) ) {
+			const moduleUrl = 'https://cdn.jsdelivr.net/npm/@rive-app/canvas@' + key + '/+esm';
+			editorRiveModulePromises.set(
+				key,
+				import( /* webpackIgnore: true */ moduleUrl )
+			);
+		}
+		return editorRiveModulePromises.get( key );
+	}
+
+	function MotionPlayerRiveEditorPreview( props ) {
+		const { src, width, height } = props;
+		const canvasRef = useRef( null );
+		const riveRef = useRef( null );
+		const [ status, setStatus ] = useState( src ? 'loading' : 'idle' );
+		const version = getRiveRuntimeVersion();
+
+		useEffect(
+			function() {
+				if ( ! src ) {
+					setStatus( 'idle' );
+					return;
+				}
+
+				let cancelled = false;
+				setStatus( 'loading' );
+
+				const ver = version && /^[\d.]+$/.test( String( version ) ) ? String( version ) : '2.19.6';
+				const autoplay = shouldAutoplayRive();
+
+				loadEditorRiveModule( ver )
+					.then( function( mod ) {
+						if ( cancelled || ! canvasRef.current ) {
+							return;
+						}
+						const canvas = canvasRef.current;
+						if ( riveRef.current && typeof riveRef.current.cleanup === 'function' ) {
+							riveRef.current.cleanup();
+							riveRef.current = null;
+						}
+						canvas.width = width;
+						canvas.height = height;
+						const layout = new mod.Layout( {
+							fit: mod.Fit.Contain,
+							alignment: mod.Alignment.Center,
+						} );
+						const r = new mod.Rive( {
+							src: src,
+							canvas: canvas,
+							layout: layout,
+							autoplay: autoplay,
+						} );
+						riveRef.current = r;
+						if ( typeof r.resizeDrawingSurfaceToCanvas === 'function' ) {
+							r.resizeDrawingSurfaceToCanvas();
+						}
+						setStatus( 'ready' );
+					} )
+					.catch( function( err ) {
+						if ( ! cancelled ) {
+							setStatus( 'error' );
+							if ( typeof console !== 'undefined' && console.warn ) {
+								console.warn( '[MotionPlayer Rive]', err );
+							}
+						}
+					} );
+
+				return function() {
+					cancelled = true;
+					if ( riveRef.current && typeof riveRef.current.cleanup === 'function' ) {
+						riveRef.current.cleanup();
+					}
+					riveRef.current = null;
+				};
+			},
+			[ src, width, height, version ]
+		);
+
+		return createElement(
+			Fragment,
+			null,
+			status === 'loading' &&
+				createElement(
+					'p',
+					{ className: 'motion-player-rive-editor__preview-status' },
+					__( 'Loading preview…', 'motion-player-rive' )
+				),
+			status === 'error' &&
+				createElement(
+					'p',
+					{ className: 'motion-player-rive-editor__preview-status' },
+					__(
+						'Could not load preview. Check your network or .riv file.',
+						'motion-player-rive'
+					)
+				),
+			! shouldAutoplayRive() &&
+				status === 'ready' &&
+				createElement(
+					'p',
+					{ className: 'motion-player-rive-editor__preview-status' },
+					__( 'Reduced motion: preview is paused (first frame).', 'motion-player-rive' )
+				),
+			createElement(
+				'div',
+				{
+					className: 'motion-player-rive-editor__frame',
+					style: { maxWidth: width + 'px' },
+				},
+				createElement( 'canvas', {
+					ref: canvasRef,
+					className: 'motion-player-rive-editor__canvas motion-player-rive__canvas',
+					width: width,
+					height: height,
+					'aria-hidden': true,
+				} )
+			)
+		);
 	}
 
 	registerBlockType( BLOCK_NAME, {
@@ -69,6 +224,13 @@
 				( media && media.title && media.title.rendered ) ||
 				( media && media.slug ) ||
 				'';
+
+			const previewReady =
+				rivAttachmentId &&
+				typeof media !== 'undefined' &&
+				media !== null &&
+				isRiveMedia( media );
+			const previewSrc = previewReady ? getMediaSrc( media ) : '';
 
 			return createElement(
 				Fragment,
@@ -179,18 +341,17 @@
 									': ',
 									title || '#' + rivAttachmentId
 								),
-								createElement(
-									'p',
-									{ className: 'motion-player-rive-editor__note' },
-									__( 'Animation plays on the front end.', 'motion-player-rive' )
-								),
-								createElement( 'div', {
-									className: 'motion-player-rive-editor__frame',
-									style: {
-										maxWidth: canvasWidth + 'px',
-										aspectRatio: canvasWidth + ' / ' + canvasHeight,
-									},
-								} )
+								previewSrc
+									? createElement( MotionPlayerRiveEditorPreview, {
+											src: previewSrc,
+											width: canvasWidth,
+											height: canvasHeight,
+									  } )
+									: createElement(
+											'p',
+											{ className: 'motion-player-rive-editor__note' },
+											__( 'Loading file details…', 'motion-player-rive' )
+									  )
 						  )
 						: createElement(
 								'p',

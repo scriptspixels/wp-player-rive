@@ -24,8 +24,24 @@
 
 .motion-player-rive-editor__frame {
 	width: 100%;
-	border: 1px dashed currentColor;
-	border-radius: 2px;
-	opacity: 0.35;
+	max-width: 100%;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
 	box-sizing: border-box;
+	overflow: hidden;
+	background: #fff;
+}
+
+.motion-player-rive-editor__canvas {
+	display: block;
+	width: 100%;
+	height: auto;
+	vertical-align: middle;
+}
+
+.motion-player-rive-editor__preview-status {
+	margin: 0 0 0.5rem;
+	font-size: 12px;
+	color: var(--wp--preset--color--contrast, #1e1e1e);
+	opacity: 0.75;
 }
