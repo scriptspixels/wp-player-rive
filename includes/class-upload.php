@@ -22,6 +22,7 @@ class Motion_Player_Rive_Upload {
 	public function init() {
 		add_filter( 'upload_mimes', array( $this, 'upload_mimes' ) );
 		add_filter( 'wp_check_filetype_and_ext', array( $this, 'fix_filetype' ), 10, 5 );
+		add_filter( 'upload_filetypes', array( $this, 'upload_filetypes' ) );
 	}
 
 	/**
@@ -46,18 +47,29 @@ class Motion_Player_Rive_Upload {
 	 * @return array
 	 */
 	public function fix_filetype( $data, $file, $filename, $mimes, $real_mime = '' ) {
-		if ( ! empty( $data['ext'] ) && ! empty( $data['type'] ) ) {
-			return $data;
-		}
-
 		$extension = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
 		if ( 'riv' !== $extension ) {
 			return $data;
 		}
 
+		// Always normalize .riv so core does not leave octet-stream / empty ext on the attachment.
 		$data['ext']  = 'riv';
 		$data['type'] = 'application/rive';
 
 		return $data;
+	}
+
+	/**
+	 * Allow .riv on multisite (Network Settings → Upload file types).
+	 *
+	 * @param string $types Space-separated list of extensions without dots.
+	 * @return string
+	 */
+	public function upload_filetypes( $types ) {
+		$list = array_filter( array_map( 'trim', explode( ' ', (string) $types ) ) );
+		if ( ! in_array( 'riv', $list, true ) ) {
+			$types = trim( (string) $types . ' riv' );
+		}
+		return $types;
 	}
 }

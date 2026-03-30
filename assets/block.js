@@ -9,17 +9,41 @@
 	const BLOCK_NAME = 'motion-player-rive/player';
 	const MIME_RIVE = 'application/rive';
 
+	function getAttachmentMime( media ) {
+		if ( ! media ) {
+			return '';
+		}
+		const m = media.mime || media.mime_type;
+		return ( m || '' ).toLowerCase();
+	}
+
 	function isRiveMedia( media ) {
 		if ( ! media ) {
 			return false;
 		}
-		if ( media.mime === MIME_RIVE ) {
+		const mime = getAttachmentMime( media );
+		if ( mime === MIME_RIVE ) {
 			return true;
+		}
+		// Some installs store unknown binaries as octet-stream; allow if URL/name is .riv.
+		if ( mime === 'application/octet-stream' ) {
+			if ( media.url && /\.riv$/i.test( media.url.split( '?' )[ 0 ] ) ) {
+				return true;
+			}
+			if ( media.filename && /\.riv$/i.test( media.filename ) ) {
+				return true;
+			}
+			if ( typeof media.slug === 'string' && /\.riv$/i.test( media.slug ) ) {
+				return true;
+			}
 		}
 		if ( media.url && /\.riv$/i.test( media.url.split( '?' )[ 0 ] ) ) {
 			return true;
 		}
 		if ( media.filename && /\.riv$/i.test( media.filename ) ) {
+			return true;
+		}
+		if ( typeof media.slug === 'string' && /\.riv$/i.test( media.slug ) ) {
 			return true;
 		}
 		return false;
@@ -70,6 +94,27 @@
 		return editorRiveModulePromises.get( key );
 	}
 
+	/** jsDelivr +esm exposes the runtime on `default`, not as named exports. */
+	function getRivePackage( mod ) {
+		if ( ! mod ) {
+			return { Rive: null, Layout: null, Fit: null, Alignment: null };
+		}
+		const fromDefault =
+			mod.default &&
+			typeof mod.default === 'object' &&
+			typeof mod.default.Rive === 'function'
+				? mod.default
+				: null;
+		const fromNamed = typeof mod.Rive === 'function' ? mod : null;
+		const pkg = fromDefault || fromNamed || mod.default || mod;
+		return {
+			Rive: pkg.Rive,
+			Layout: pkg.Layout,
+			Fit: pkg.Fit,
+			Alignment: pkg.Alignment,
+		};
+	}
+
 	function MotionPlayerRiveEditorPreview( props ) {
 		const { src, width, height } = props;
 		const canvasRef = useRef( null );
@@ -95,6 +140,10 @@
 						if ( cancelled || ! canvasRef.current ) {
 							return;
 						}
+						const { Rive, Layout, Fit, Alignment } = getRivePackage( mod );
+						if ( ! Rive || ! Layout || ! Fit || ! Alignment ) {
+							throw new Error( 'Rive runtime missing exports' );
+						}
 						const canvas = canvasRef.current;
 						if ( riveRef.current && typeof riveRef.current.cleanup === 'function' ) {
 							riveRef.current.cleanup();
@@ -102,11 +151,11 @@
 						}
 						canvas.width = width;
 						canvas.height = height;
-						const layout = new mod.Layout( {
-							fit: mod.Fit.Contain,
-							alignment: mod.Alignment.Center,
+						const layout = new Layout( {
+							fit: Fit.Contain,
+							alignment: Alignment.Center,
 						} );
-						const r = new mod.Rive( {
+						const r = new Rive( {
 							src: src,
 							canvas: canvas,
 							layout: layout,
@@ -254,10 +303,16 @@
 										);
 										return;
 									}
-									setAttributes( { rivAttachmentId: selected.id } );
+									const rawId = selected.id;
+									const id =
+										typeof rawId === 'string' ? parseInt( rawId, 10 ) : rawId;
+									if ( ! id ) {
+										return;
+									}
+									setAttributes( { rivAttachmentId: id } );
 								},
-								allowedTypes: [ MIME_RIVE ],
-								value: rivAttachmentId || 0,
+								// Omit allowedTypes so uploads / library work when MIME varies; we validate in onSelect.
+								value: rivAttachmentId > 0 ? rivAttachmentId : undefined,
 								render: function( { open } ) {
 									return createElement(
 										'div',

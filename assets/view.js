@@ -42,6 +42,32 @@ async function loadRiveModule( version ) {
 	return import( /* @vite-ignore */ url );
 }
 
+/**
+ * jsDelivr +esm bundles this package as `default` only; named imports are undefined.
+ *
+ * @param {Record<string, unknown>} mod Dynamic import namespace.
+ * @return {{ Rive: object, Layout: object, Fit: object, Alignment: object }}
+ */
+function getRivePackage( mod ) {
+	if ( ! mod ) {
+		return { Rive: null, Layout: null, Fit: null, Alignment: null };
+	}
+	const fromDefault =
+		mod.default &&
+		typeof mod.default === 'object' &&
+		typeof mod.default.Rive === 'function'
+			? mod.default
+			: null;
+	const fromNamed = typeof mod.Rive === 'function' ? mod : null;
+	const pkg = fromDefault || fromNamed || mod.default || mod;
+	return {
+		Rive: pkg.Rive,
+		Layout: pkg.Layout,
+		Fit: pkg.Fit,
+		Alignment: pkg.Alignment,
+	};
+}
+
 function disposeContainer( el ) {
 	const existing = containerInstances.get( el );
 	if ( existing && typeof existing.cleanup === 'function' ) {
@@ -58,7 +84,9 @@ function disposeContainer( el ) {
 
 function initContainer( el, Rive, Layout, Fit, Alignment ) {
 	const src = el.getAttribute( 'data-rive-src' );
-	const canvas = el.querySelector( ':scope > canvas.motion-player-rive__canvas' );
+	const canvas =
+		el.querySelector( ':scope > canvas.motion-player-rive__canvas' ) ||
+		el.querySelector( 'canvas.motion-player-rive__canvas' );
 	if ( ! src || ! canvas ) {
 		return;
 	}
@@ -111,10 +139,10 @@ function initAll() {
 	byVersion.forEach( function( elements, version ) {
 		loadRiveModule( version )
 			.then( function( mod ) {
-				const Rive = mod.Rive;
-				const Layout = mod.Layout;
-				const Fit = mod.Fit;
-				const Alignment = mod.Alignment;
+				const { Rive, Layout, Fit, Alignment } = getRivePackage( mod );
+				if ( ! Rive || ! Layout || ! Fit || ! Alignment ) {
+					throw new Error( 'Rive runtime missing exports (expected default.Rive, …)' );
+				}
 				elements.forEach( function( el ) {
 					if ( ! el.isConnected ) {
 						return;
