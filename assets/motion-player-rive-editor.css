@@ -29,7 +29,7 @@
 	border-radius: 4px;
 	box-sizing: border-box;
 	overflow: hidden;
-	background: #fff;
+	background: transparent;
 }
 
 .motion-player-rive-editor__canvas {
@@ -37,6 +37,7 @@
 	width: 100%;
 	height: auto;
 	vertical-align: middle;
+	background: transparent;
 }
 
 .motion-player-rive-editor__preview-status {

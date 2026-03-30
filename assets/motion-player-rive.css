@@ -1,5 +1,6 @@
 .wp-block-motion-player-rive-player .motion-player-rive {
 	width: 100%;
+	background: transparent;
 }
 
 .wp-block-motion-player-rive-player .motion-player-rive__canvas {
@@ -7,4 +8,5 @@
 	width: 100%;
 	height: auto;
 	vertical-align: middle;
+	background: transparent;
 }

@@ -93,6 +93,8 @@ function initContainer( el, Rive, Layout, Fit, Alignment ) {
 
 	disposeContainer( el );
 
+	canvas.style.backgroundColor = 'transparent';
+
 	const fit = resolveFit( Fit, el.getAttribute( 'data-rive-fit' ) );
 	const alignment = resolveAlignment( Alignment, el.getAttribute( 'data-rive-align' ) );
 	const layout = new Layout( { fit, alignment } );

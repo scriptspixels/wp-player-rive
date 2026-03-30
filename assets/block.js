@@ -151,6 +151,7 @@
 						}
 						canvas.width = width;
 						canvas.height = height;
+						canvas.style.backgroundColor = 'transparent';
 						const layout = new Layout( {
 							fit: Fit.Contain,
 							alignment: Alignment.Center,
@@ -223,6 +224,7 @@
 					className: 'motion-player-rive-editor__canvas motion-player-rive__canvas',
 					width: width,
 					height: height,
+					style: { backgroundColor: 'transparent' },
 					'aria-hidden': true,
 				} )
 			)
