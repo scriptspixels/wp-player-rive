@@ -1,6 +1,5 @@
 === MotionPlayer for Rive ===
-Contributors: scriptsandpixels
-Tags: rive, animation, block, media
+Tags: rive, animation, block, gutenberg, media
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -8,29 +7,72 @@ Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Embed Rive (.riv) animations with a block. Pick a file from the media library; the animation plays on the front end.
+Embed Rive (.riv) animations in the block editor. Free version: pick a file from the media library, set canvas size, optional accessible name. A MotionPlayer Pro upgrade is planned for advanced player controls.
 
 == Description ==
 
-MotionPlayer for Rive adds a **MotionPlayer: Rive** block. The free version lets you upload or select a `.riv` file and set canvas dimensions and an optional accessible name. The Rive Canvas runtime loads on the front end when the block is present.
+**MotionPlayer for Rive** adds a **MotionPlayer: Rive** block so you can upload or select `.riv` files from the Media Library and play them on the front end.
+
+= Free version (this plugin) =
+
+* Gutenberg block with media picker for `.riv` files
+* Canvas width and height in the block sidebar
+* Optional accessible name for the canvas
+* Live preview in the editor (WebGL2)
+* Front-end playback using the official **@rive-app/webgl2** runtime (Rive Renderer), so shadows, gradients, and blend modes match how files are authored
+
+= MotionPlayer Pro (coming later) =
+
+A future **Pro** add-on will extend the player with additional controls and features. This repository release is the **free** base plugin only.
 
 == Installation ==
 
-1. Upload the plugin folder to `/wp-content/plugins/` or install the zip from the Plugins screen.
+1. Upload the plugin folder to `/wp-content/plugins/`, or install the ZIP from the Plugins screen in WordPress.
 2. Activate **MotionPlayer for Rive** through the **Plugins** menu.
-3. Add the **MotionPlayer: Rive** block and choose a `.riv` file.
+3. Edit a post or page, insert **MotionPlayer: Rive**, and choose a `.riv` file.
 
 == Frequently Asked Questions ==
 
-= Does this work in the block editor only? =
+= Does this work only in the block editor? =
 
 Yes. The block is registered for the block editor.
 
 = Where does the Rive runtime load from? =
 
-The front end loads the official `@rive-app/webgl2` UMD bundle (`rive.js` from unpkg), same pattern as enqueueing Rive in a theme — Rive Renderer handles shadows, gradients, and blend modes as authored.
+The plugin enqueues the official **@rive-app/webgl2** UMD bundle (`rive.js`) from **unpkg.com**, pinned to the same major version the plugin is tested with. Your site’s visitors request that script from unpkg when a page contains the block. See **Privacy** below.
+
+= Why WebGL2? =
+
+The WebGL2 (Rive Renderer) path supports advanced visuals—drop shadows, gradients, blend modes, vector feathering—that the older canvas-only runtime does not render the same way.
+
+= Will this work without JavaScript or WebGL2? =
+
+No. Playback requires JavaScript and a browser with WebGL2 support.
+
+== Screenshots ==
+
+1. MotionPlayer: Rive block in the editor with media controls
+2. Canvas and accessibility options in the block sidebar
+3. Animation playing on the front end
+
+== Upgrade Notice ==
+
+= 0.1.0 =
+Initial WordPress.org release of the free MotionPlayer for Rive block.
 
 == Changelog ==
 
 = 0.1.0 =
-* Initial release: Rive block, media upload, basic canvas size and accessibility label.
+* Initial release: `.riv` block, media upload, WebGL2 runtime (unpkg), editor preview, canvas size and accessible name.
+
+== Privacy ==
+
+This plugin:
+
+* Registers the `.riv` MIME type and stores attachment IDs in block attributes like other media blocks.
+* Loads the **Rive WebGL2 JavaScript runtime** from **https://unpkg.com** when the block is used (editor and front end). Unpkg may log standard HTTP data (IP, user agent, URL) per their policy. No personal data is sent from your site to unpkg beyond a normal script request.
+* Does not collect analytics or call home.
+
+== External services ==
+
+* **unpkg** — hosts the `@rive-app/webgl2` `rive.js` bundle loaded by WordPress when the plugin’s scripts run. [Terms of Use](https://unpkg.com/terms-of-use) · [Privacy](https://www.cloudflare.com/privacypolicy/) (Cloudflare operates unpkg).
