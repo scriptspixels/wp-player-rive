@@ -15,9 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Motion_Player_Rive_Block {
 	/**
-	 * Rive Canvas runtime version (pinned for predictable behavior).
+	 * @rive-app/webgl2 version (official UMD rive.js from unpkg — Rive Renderer for shadows, gradients, blends).
 	 */
-	const RIVE_RUNTIME_VERSION = '2.19.6';
+	const RIVE_RUNTIME_VERSION = '2.35.0';
 
 	/**
 	 * Register hooks.
@@ -37,19 +37,27 @@ class Motion_Player_Rive_Block {
 		$script_handle = 'motion-player-rive-block';
 
 		wp_register_script(
-			$script_handle,
-			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/block.js',
-			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-data' ),
-			MOTION_PLAYER_RIVE_VERSION,
+			'motion-player-rive-webgl2',
+			'https://unpkg.com/@rive-app/webgl2@' . self::RIVE_RUNTIME_VERSION . '/rive.js',
+			array(),
+			self::RIVE_RUNTIME_VERSION,
 			true
 		);
 
-		wp_localize_script(
+		wp_register_script(
 			$script_handle,
-			'motionPlayerRiveBlock',
+			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/block.js',
 			array(
-				'riveRuntimeVersion' => self::RIVE_RUNTIME_VERSION,
-			)
+				'wp-blocks',
+				'wp-element',
+				'wp-i18n',
+				'wp-components',
+				'wp-block-editor',
+				'wp-data',
+				'motion-player-rive-webgl2',
+			),
+			MOTION_PLAYER_RIVE_VERSION,
+			true
 		);
 
 		wp_register_style(
@@ -69,11 +77,10 @@ class Motion_Player_Rive_Block {
 		wp_register_script(
 			'motion-player-rive-view',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/view.js',
-			array(),
+			array( 'motion-player-rive-webgl2' ),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
 		);
-		wp_script_add_data( 'motion-player-rive-view', 'type', 'module' );
 
 		register_block_type_from_metadata(
 			MOTION_PLAYER_RIVE_PLUGIN_DIR . 'blocks/motion-player-rive',
@@ -125,9 +132,10 @@ class Motion_Player_Rive_Block {
 		wp_enqueue_script( 'motion-player-rive-view' );
 
 		$extra_attrs = array(
-			'class'             => 'motion-player-rive',
-			'data-rive-src'     => $url,
-			'data-rive-version' => self::RIVE_RUNTIME_VERSION,
+			'class'               => 'motion-player-rive',
+			'data-rive-src'       => $url,
+			'data-rive-renderer'  => 'webgl2',
+			'data-rive-version'   => self::RIVE_RUNTIME_VERSION,
 			'style'             => sprintf( 'max-width:%dpx;', $width ),
 			'data-rive-fit'     => 'contain',
 			'data-rive-align'   => 'center',

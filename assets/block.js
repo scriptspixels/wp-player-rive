@@ -62,16 +62,6 @@
 		return '';
 	}
 
-	function getRiveRuntimeVersion() {
-		if (
-			typeof window.motionPlayerRiveBlock !== 'undefined' &&
-			window.motionPlayerRiveBlock.riveRuntimeVersion
-		) {
-			return window.motionPlayerRiveBlock.riveRuntimeVersion;
-		}
-		return '2.19.6';
-	}
-
 	function shouldAutoplayRive() {
 		if ( typeof window === 'undefined' || ! window.matchMedia ) {
 			return true;
@@ -79,39 +69,29 @@
 		return ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 	}
 
-	/** Reuse one dynamic import per runtime version when many blocks are on the canvas. */
-	const editorRiveModulePromises = new Map();
-
-	function loadEditorRiveModule( ver ) {
-		const key = ver && /^[\d.]+$/.test( String( ver ) ) ? String( ver ) : '2.19.6';
-		if ( ! editorRiveModulePromises.has( key ) ) {
-			const moduleUrl = 'https://cdn.jsdelivr.net/npm/@rive-app/canvas@' + key + '/+esm';
-			editorRiveModulePromises.set(
-				key,
-				import( /* webpackIgnore: true */ moduleUrl )
-			);
-		}
-		return editorRiveModulePromises.get( key );
-	}
-
-	/** jsDelivr +esm exposes the runtime on `default`, not as named exports. */
-	function getRivePackage( mod ) {
-		if ( ! mod ) {
+	/** Official UMD bundle sets window.rive (same as unpkg …/rive.js). */
+	function getRivePackageFromGlobal() {
+		const riv = typeof window !== 'undefined' ? window.rive : null;
+		if ( ! riv ) {
 			return { Rive: null, Layout: null, Fit: null, Alignment: null };
 		}
-		const fromDefault =
-			mod.default &&
-			typeof mod.default === 'object' &&
-			typeof mod.default.Rive === 'function'
-				? mod.default
-				: null;
-		const fromNamed = typeof mod.Rive === 'function' ? mod : null;
-		const pkg = fromDefault || fromNamed || mod.default || mod;
+		if (
+			riv.default &&
+			typeof riv.default === 'object' &&
+			typeof riv.default.Rive === 'function'
+		) {
+			return {
+				Rive: riv.default.Rive,
+				Layout: riv.default.Layout,
+				Fit: riv.default.Fit,
+				Alignment: riv.default.Alignment,
+			};
+		}
 		return {
-			Rive: pkg.Rive,
-			Layout: pkg.Layout,
-			Fit: pkg.Fit,
-			Alignment: pkg.Alignment,
+			Rive: riv.Rive,
+			Layout: riv.Layout,
+			Fit: riv.Fit,
+			Alignment: riv.Alignment,
 		};
 	}
 
@@ -120,7 +100,6 @@
 		const canvasRef = useRef( null );
 		const riveRef = useRef( null );
 		const [ status, setStatus ] = useState( src ? 'loading' : 'idle' );
-		const version = getRiveRuntimeVersion();
 
 		useEffect(
 			function() {
@@ -132,50 +111,47 @@
 				let cancelled = false;
 				setStatus( 'loading' );
 
-				const ver = version && /^[\d.]+$/.test( String( version ) ) ? String( version ) : '2.19.6';
 				const autoplay = shouldAutoplayRive();
 
-				loadEditorRiveModule( ver )
-					.then( function( mod ) {
-						if ( cancelled || ! canvasRef.current ) {
-							return;
-						}
-						const { Rive, Layout, Fit, Alignment } = getRivePackage( mod );
-						if ( ! Rive || ! Layout || ! Fit || ! Alignment ) {
-							throw new Error( 'Rive runtime missing exports' );
-						}
-						const canvas = canvasRef.current;
-						if ( riveRef.current && typeof riveRef.current.cleanup === 'function' ) {
-							riveRef.current.cleanup();
-							riveRef.current = null;
-						}
-						canvas.width = width;
-						canvas.height = height;
-						canvas.style.backgroundColor = 'transparent';
-						const layout = new Layout( {
-							fit: Fit.Contain,
-							alignment: Alignment.Center,
-						} );
-						const r = new Rive( {
-							src: src,
-							canvas: canvas,
-							layout: layout,
-							autoplay: autoplay,
-						} );
-						riveRef.current = r;
-						if ( typeof r.resizeDrawingSurfaceToCanvas === 'function' ) {
-							r.resizeDrawingSurfaceToCanvas();
-						}
-						setStatus( 'ready' );
-					} )
-					.catch( function( err ) {
-						if ( ! cancelled ) {
-							setStatus( 'error' );
-							if ( typeof console !== 'undefined' && console.warn ) {
-								console.warn( '[MotionPlayer Rive]', err );
-							}
-						}
+				try {
+					const { Rive, Layout, Fit, Alignment } = getRivePackageFromGlobal();
+					if ( ! Rive || ! Layout || ! Fit || ! Alignment ) {
+						throw new Error( 'window.rive missing (load @rive-app/webgl2/rive.js first)' );
+					}
+					if ( cancelled || ! canvasRef.current ) {
+						return;
+					}
+					const canvas = canvasRef.current;
+					if ( riveRef.current && typeof riveRef.current.cleanup === 'function' ) {
+						riveRef.current.cleanup();
+						riveRef.current = null;
+					}
+					canvas.width = width;
+					canvas.height = height;
+					canvas.style.backgroundColor = 'transparent';
+					const layout = new Layout( {
+						fit: Fit.Contain,
+						alignment: Alignment.Center,
 					} );
+					const r = new Rive( {
+						src: src,
+						canvas: canvas,
+						layout: layout,
+						autoplay: autoplay,
+					} );
+					riveRef.current = r;
+					if ( typeof r.resizeDrawingSurfaceToCanvas === 'function' ) {
+						r.resizeDrawingSurfaceToCanvas();
+					}
+					setStatus( 'ready' );
+				} catch ( err ) {
+					if ( ! cancelled ) {
+						setStatus( 'error' );
+						if ( typeof console !== 'undefined' && console.warn ) {
+							console.warn( '[MotionPlayer Rive]', err );
+						}
+					}
+				}
 
 				return function() {
 					cancelled = true;
@@ -185,7 +161,7 @@
 					riveRef.current = null;
 				};
 			},
-			[ src, width, height, version ]
+			[ src, width, height ]
 		);
 
 		return createElement(

@@ -28,7 +28,7 @@ Yes. The block is registered for the block editor.
 
 = Where does the Rive runtime load from? =
 
-The front end loads `@rive-app/canvas` from jsDelivr when a page contains the block.
+The front end loads the official `@rive-app/webgl2` UMD bundle (`rive.js` from unpkg), same pattern as enqueueing Rive in a theme — Rive Renderer handles shadows, gradients, and blend modes as authored.
 
 == Changelog ==
 
