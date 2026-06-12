@@ -45,6 +45,14 @@ class Motion_Player_Rive_Block {
 		);
 
 		wp_register_script(
+			'motion-player-rive-playback',
+			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/rive-playback.js',
+			array(),
+			MOTION_PLAYER_RIVE_VERSION,
+			true
+		);
+
+		wp_register_script(
 			$script_handle,
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/block.js',
 			array(
@@ -55,6 +63,7 @@ class Motion_Player_Rive_Block {
 				'wp-block-editor',
 				'wp-data',
 				'motion-player-rive-webgl2',
+				'motion-player-rive-playback',
 			),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
@@ -77,7 +86,7 @@ class Motion_Player_Rive_Block {
 		wp_register_script(
 			'motion-player-rive-view',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/view.js',
-			array( 'motion-player-rive-webgl2' ),
+			array( 'motion-player-rive-webgl2', 'motion-player-rive-playback' ),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
 		);
@@ -129,17 +138,24 @@ class Motion_Player_Rive_Block {
 			$label = __( 'Rive animation', 'motion-player-rive' );
 		}
 
+		$state_machine = isset( $attributes['stateMachineName'] ) && is_string( $attributes['stateMachineName'] )
+			? sanitize_text_field( $attributes['stateMachineName'] )
+			: '';
+
 		wp_enqueue_script( 'motion-player-rive-view' );
 
 		$extra_attrs = array(
-			'class'               => 'motion-player-rive',
-			'data-rive-src'       => $url,
-			'data-rive-renderer'  => 'webgl2',
-			'data-rive-version'   => self::RIVE_RUNTIME_VERSION,
-			'style'             => sprintf( 'max-width:%dpx;', $width ),
-			'data-rive-fit'     => 'contain',
-			'data-rive-align'   => 'center',
+			'class'              => 'motion-player-rive',
+			'data-rive-src'      => $url,
+			'data-rive-renderer' => 'webgl2',
+			'data-rive-version'  => self::RIVE_RUNTIME_VERSION,
+			'style'              => sprintf( 'max-width:%dpx;', $width ),
+			'data-rive-fit'      => 'contain',
+			'data-rive-align'    => 'center',
 		);
+		if ( '' !== $state_machine ) {
+			$extra_attrs['data-rive-state-machine'] = $state_machine;
+		}
 
 		global $wp_version;
 		if ( $block instanceof WP_Block && version_compare( (string) $wp_version, '6.3', '>=' ) ) {

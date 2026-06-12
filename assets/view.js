@@ -99,18 +99,25 @@
 			window.matchMedia &&
 			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
-		const rive = new Rive( {
+		const playback = window.motionPlayerRivePlayback;
+		if ( ! playback || typeof playback.createInstance !== 'function' ) {
+			if ( typeof console !== 'undefined' && console.warn ) {
+				console.warn( '[MotionPlayer Rive] rive-playback.js is missing.' );
+			}
+			return;
+		}
+
+		const stateMachineName = el.getAttribute( 'data-rive-state-machine' ) || '';
+
+		const rive = playback.createInstance( Rive, {
 			src,
 			canvas,
 			layout,
 			autoplay: ! reduceMotion,
+			stateMachineName,
 		} );
 
 		containerInstances.set( el, rive );
-
-		if ( typeof rive.resizeDrawingSurfaceToCanvas === 'function' ) {
-			rive.resizeDrawingSurfaceToCanvas();
-		}
 	}
 
 	function initAll() {

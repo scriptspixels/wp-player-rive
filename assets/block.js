@@ -96,7 +96,7 @@
 	}
 
 	function MotionPlayerRiveEditorPreview( props ) {
-		const { src, width, height } = props;
+		const { src, width, height, stateMachineName } = props;
 		const canvasRef = useRef( null );
 		const riveRef = useRef( null );
 		const [ status, setStatus ] = useState( src ? 'loading' : 'idle' );
@@ -133,16 +133,18 @@
 						fit: Fit.Contain,
 						alignment: Alignment.Center,
 					} );
-					const r = new Rive( {
+					const playback = window.motionPlayerRivePlayback;
+					if ( ! playback || typeof playback.createInstance !== 'function' ) {
+						throw new Error( 'motionPlayerRivePlayback is missing' );
+					}
+					const r = playback.createInstance( Rive, {
 						src: src,
 						canvas: canvas,
 						layout: layout,
 						autoplay: autoplay,
+						stateMachineName: stateMachineName || '',
 					} );
 					riveRef.current = r;
-					if ( typeof r.resizeDrawingSurfaceToCanvas === 'function' ) {
-						r.resizeDrawingSurfaceToCanvas();
-					}
 					setStatus( 'ready' );
 				} catch ( err ) {
 					if ( ! cancelled ) {
@@ -161,7 +163,7 @@
 					riveRef.current = null;
 				};
 			},
-			[ src, width, height ]
+			[ src, width, height, stateMachineName ]
 		);
 
 		return createElement(
@@ -209,7 +211,7 @@
 
 	registerBlockType( BLOCK_NAME, {
 		edit: ( { attributes, setAttributes } ) => {
-			const { rivAttachmentId, canvasWidth, canvasHeight, accessibleLabel } = attributes;
+			const { rivAttachmentId, canvasWidth, canvasHeight, accessibleLabel, stateMachineName } = attributes;
 
 			const media = useSelect(
 				function( select ) {
@@ -353,6 +355,17 @@
 							onChange: function( v ) {
 								setAttributes( { accessibleLabel: v || '' } );
 							},
+						} ),
+						createElement( TextControl, {
+							label: __( 'State machine name (optional)', 'motion-player-rive' ),
+							help: __(
+								'Use when your .riv file is driven by a state machine. Leave empty to play the first state machine or animation found.',
+								'motion-player-rive'
+							),
+							value: stateMachineName || '',
+							onChange: function( v ) {
+								setAttributes( { stateMachineName: v || '' } );
+							},
 						} )
 					)
 				),
@@ -379,6 +392,7 @@
 											src: previewSrc,
 											width: canvasWidth,
 											height: canvasHeight,
+											stateMachineName: stateMachineName || '',
 									  } )
 									: createElement(
 											'p',

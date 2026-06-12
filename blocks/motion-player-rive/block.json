@@ -26,6 +26,10 @@
     "accessibleLabel": {
       "type": "string",
       "default": ""
+    },
+    "stateMachineName": {
+      "type": "string",
+      "default": ""
     }
   },
   "style": "motion-player-rive-style",
