@@ -173,7 +173,7 @@
 				createElement(
 					'p',
 					{ className: 'motion-player-rive-editor__preview-status' },
-					__( 'Loading preview…', 'motion-player-rive' )
+					__( 'Loading preview…', 'motionplayer-for-rive' )
 				),
 			status === 'error' &&
 				createElement(
@@ -181,7 +181,7 @@
 					{ className: 'motion-player-rive-editor__preview-status' },
 					__(
 						'Could not load preview. Check your network or .riv file.',
-						'motion-player-rive'
+						'motionplayer-for-rive'
 					)
 				),
 			! shouldAutoplayRive() &&
@@ -189,7 +189,7 @@
 				createElement(
 					'p',
 					{ className: 'motion-player-rive-editor__preview-status' },
-					__( 'Reduced motion: preview is paused (first frame).', 'motion-player-rive' )
+					__( 'Reduced motion: preview is paused (first frame).', 'motionplayer-for-rive' )
 				),
 			createElement(
 				'div',
@@ -239,7 +239,7 @@
 						setAttributes( { rivAttachmentId: 0 } );
 						wp.data.dispatch( 'core/notices' ).createNotice(
 							'error',
-							__( 'Please choose a .riv file.', 'motion-player-rive' ),
+							__( 'Please choose a .riv file.', 'motionplayer-for-rive' ),
 							{ type: 'snackbar', id: 'motion-player-rive-bad-type' }
 						);
 					}
@@ -269,7 +269,7 @@
 					null,
 					createElement(
 						PanelBody,
-						{ title: __( 'Rive file', 'motion-player-rive' ), initialOpen: true },
+						{ title: __( 'Rive file', 'motionplayer-for-rive' ), initialOpen: true },
 						createElement(
 							MediaUploadCheck,
 							null,
@@ -278,7 +278,7 @@
 									if ( ! selected || ! isRiveMedia( selected ) ) {
 										wp.data.dispatch( 'core/notices' ).createNotice(
 											'error',
-											__( 'Please choose a .riv file.', 'motion-player-rive' ),
+											__( 'Please choose a .riv file.', 'motionplayer-for-rive' ),
 											{ type: 'snackbar', id: 'motion-player-rive-bad-type' }
 										);
 										return;
@@ -301,8 +301,8 @@
 											Button,
 											{ isPrimary: true, onClick: open },
 											rivAttachmentId
-												? __( 'Replace .riv file', 'motion-player-rive' )
-												: __( 'Upload or select .riv file', 'motion-player-rive' )
+												? __( 'Replace .riv file', 'motionplayer-for-rive' )
+												: __( 'Upload or select .riv file', 'motionplayer-for-rive' )
 										),
 										rivAttachmentId
 											? createElement(
@@ -314,7 +314,7 @@
 															setAttributes( { rivAttachmentId: 0 } );
 														},
 													},
-													__( 'Remove', 'motion-player-rive' )
+													__( 'Remove', 'motionplayer-for-rive' )
 											  )
 											: null
 									);
@@ -324,9 +324,9 @@
 					),
 					createElement(
 						PanelBody,
-						{ title: __( 'Canvas', 'motion-player-rive' ), initialOpen: true },
+						{ title: __( 'Canvas', 'motionplayer-for-rive' ), initialOpen: true },
 						createElement( RangeControl, {
-							label: __( 'Width (px)', 'motion-player-rive' ),
+							label: __( 'Width (px)', 'motionplayer-for-rive' ),
 							value: canvasWidth,
 							onChange: function( v ) {
 								setAttributes( { canvasWidth: v } );
@@ -336,7 +336,7 @@
 							step: 1,
 						} ),
 						createElement( RangeControl, {
-							label: __( 'Height (px)', 'motion-player-rive' ),
+							label: __( 'Height (px)', 'motionplayer-for-rive' ),
 							value: canvasHeight,
 							onChange: function( v ) {
 								setAttributes( { canvasHeight: v } );
@@ -346,10 +346,10 @@
 							step: 1,
 						} ),
 						createElement( TextControl, {
-							label: __( 'Accessible name (optional)', 'motion-player-rive' ),
+							label: __( 'Accessible name (optional)', 'motionplayer-for-rive' ),
 							help: __(
 								'Describe the animation for screen readers. Leave empty to use the media title.',
-								'motion-player-rive'
+								'motionplayer-for-rive'
 							),
 							value: accessibleLabel || '',
 							onChange: function( v ) {
@@ -357,10 +357,10 @@
 							},
 						} ),
 						createElement( TextControl, {
-							label: __( 'State machine name (optional)', 'motion-player-rive' ),
+							label: __( 'State machine name (optional)', 'motionplayer-for-rive' ),
 							help: __(
 								'Use when your .riv file is driven by a state machine. Leave empty to play the first state machine or animation found.',
-								'motion-player-rive'
+								'motionplayer-for-rive'
 							),
 							value: stateMachineName || '',
 							onChange: function( v ) {
@@ -382,7 +382,7 @@
 									createElement(
 										'strong',
 										null,
-										__( 'Rive file', 'motion-player-rive' )
+										__( 'Rive file', 'motionplayer-for-rive' )
 									),
 									': ',
 									title || '#' + rivAttachmentId
@@ -397,13 +397,13 @@
 									: createElement(
 											'p',
 											{ className: 'motion-player-rive-editor__note' },
-											__( 'Loading file details…', 'motion-player-rive' )
+											__( 'Loading file details…', 'motionplayer-for-rive' )
 									  )
 						  )
 						: createElement(
 								'p',
 								{ className: 'motion-player-rive-editor__empty' },
-								__( 'Upload or select a .riv file from the media library.', 'motion-player-rive' )
+								__( 'Upload or select a .riv file from the media library.', 'motionplayer-for-rive' )
 						  )
 				)
 			);

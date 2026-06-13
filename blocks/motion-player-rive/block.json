@@ -1,11 +1,11 @@
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "motion-player-rive/player",
   "title": "MotionPlayer: Rive",
   "category": "media",
   "icon": "format-video",
   "description": "Play a Rive (.riv) animation from your media library.",
-  "textdomain": "motion-player-rive",
+  "textdomain": "motionplayer-for-rive",
   "supports": {
     "html": false,
     "align": true

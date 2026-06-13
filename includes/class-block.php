@@ -135,7 +135,7 @@ class Motion_Player_Rive_Block {
 			$label = get_the_title( $attachment_id );
 		}
 		if ( '' === $label ) {
-			$label = __( 'Rive animation', 'motion-player-rive' );
+			$label = __( 'Rive animation', 'motionplayer-for-rive' );
 		}
 
 		$state_machine = isset( $attributes['stateMachineName'] ) && is_string( $attributes['stateMachineName'] )
