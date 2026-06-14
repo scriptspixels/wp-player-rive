@@ -70,9 +70,9 @@ Initial WordPress.org release of the free MotionPlayer for Rive block.
 This plugin:
 
 * Registers the `.riv` MIME type and stores attachment IDs in block attributes like other media blocks.
-* Loads the **Rive WebGL2 JavaScript runtime** from **https://unpkg.com** when the block is used (editor and front end). Unpkg may log standard HTTP data (IP, user agent, URL) per their policy. No personal data is sent from your site to unpkg beyond a normal script request.
+* Loads the **Rive WebGL2 JavaScript runtime** from **https://unpkg.com** when the block is used (editor and front end). unpkg is a public CDN; requests may be logged by its operator (Cloudflare) with standard HTTP metadata (IP address, user agent, URL). No personal data is sent from your site beyond a normal script request.
 * Does not collect analytics or call home.
 
 == External services ==
 
-* **unpkg** — hosts the `@rive-app/webgl2` `rive.js` bundle loaded by WordPress when the plugin’s scripts run. [Terms of Use](https://unpkg.com/terms-of-use) · [Privacy](https://www.cloudflare.com/privacypolicy/) (Cloudflare operates unpkg).
+* **unpkg** — hosts the `@rive-app/webgl2` `rive.js` bundle loaded by WordPress when the plugin’s scripts run. unpkg runs on Cloudflare’s global network. [Terms of Service](https://www.cloudflare.com/website-terms/) · [Privacy Policy](https://www.cloudflare.com/privacypolicy/) · [Project](https://github.com/unpkg/unpkg)
