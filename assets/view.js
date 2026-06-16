@@ -1,6 +1,5 @@
 /**
- * Front-end Rive player. Uses the official @rive-app/webgl2 UMD bundle (window.rive) from unpkg —
- * same as loading rive.js directly; supports drop shadows, gradients, blend modes via Rive Renderer.
+ * Front-end Rive player. Uses the bundled @rive-app/webgl2 UMD bundle (window.rive).
  */
 ( function() {
 	'use strict';

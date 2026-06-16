@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Motion_Player_Rive_Block {
 	/**
-	 * @rive-app/webgl2 version (official UMD rive.js from unpkg — Rive Renderer for shadows, gradients, blends).
+	 * @rive-app/webgl2 version (bundled under assets/lib/ — Rive Renderer for shadows, gradients, blends).
 	 */
 	const RIVE_RUNTIME_VERSION = '2.35.0';
 
@@ -38,16 +38,32 @@ class Motion_Player_Rive_Block {
 
 		wp_register_script(
 			'motion-player-rive-webgl2',
-			'https://unpkg.com/@rive-app/webgl2@' . self::RIVE_RUNTIME_VERSION . '/rive.js',
+			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/lib/rive.js',
 			array(),
 			self::RIVE_RUNTIME_VERSION,
 			true
 		);
 
 		wp_register_script(
+			'motion-player-rive-runtime-config',
+			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/rive-runtime-config.js',
+			array( 'motion-player-rive-webgl2' ),
+			MOTION_PLAYER_RIVE_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'motion-player-rive-runtime-config',
+			'motionPlayerRiveConfig',
+			array(
+				'wasmUrl' => MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/lib/rive.wasm',
+			)
+		);
+
+		wp_register_script(
 			'motion-player-rive-playback',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/rive-playback.js',
-			array(),
+			array( 'motion-player-rive-runtime-config' ),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
 		);
@@ -63,6 +79,7 @@ class Motion_Player_Rive_Block {
 				'wp-block-editor',
 				'wp-data',
 				'motion-player-rive-webgl2',
+				'motion-player-rive-runtime-config',
 				'motion-player-rive-playback',
 			),
 			MOTION_PLAYER_RIVE_VERSION,
@@ -86,7 +103,7 @@ class Motion_Player_Rive_Block {
 		wp_register_script(
 			'motion-player-rive-view',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/view.js',
-			array( 'motion-player-rive-webgl2', 'motion-player-rive-playback' ),
+			array( 'motion-player-rive-webgl2', 'motion-player-rive-runtime-config', 'motion-player-rive-playback' ),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
 		);

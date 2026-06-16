@@ -69,7 +69,7 @@
 		return ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 	}
 
-	/** Official UMD bundle sets window.rive (same as unpkg …/rive.js). */
+	/** Bundled UMD bundle sets window.rive. */
 	function getRivePackageFromGlobal() {
 		const riv = typeof window !== 'undefined' ? window.rive : null;
 		if ( ! riv ) {
