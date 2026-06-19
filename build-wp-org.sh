@@ -47,11 +47,13 @@ cp -r "$PLUGIN_DIR/assets" "$BUILD_DIR/$PLUGIN_SLUG/"
 cp -r "$PLUGIN_DIR/blocks" "$BUILD_DIR/$PLUGIN_SLUG/"
 cp -r "$PLUGIN_DIR/languages" "$BUILD_DIR/$PLUGIN_SLUG/"
 
-# Remove development files
+# Remove development files and disallowed distribution artifacts.
 find "$BUILD_DIR/$PLUGIN_SLUG" -name ".DS_Store" -delete
 find "$BUILD_DIR/$PLUGIN_SLUG" -name "*.log" -delete
 find "$BUILD_DIR/$PLUGIN_SLUG" -name ".git*" -delete
 find "$BUILD_DIR/$PLUGIN_SLUG" -name "build-wp-org.sh" -delete
+find "$BUILD_DIR/$PLUGIN_SLUG" -name "*.wasm" -delete
+rm -rf "$BUILD_DIR/$PLUGIN_SLUG/scripts"
 
 # Create zip file
 echo "Creating zip archive..."

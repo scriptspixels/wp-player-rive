@@ -37,6 +37,14 @@ class Motion_Player_Rive_Block {
 		$script_handle = 'motion-player-rive-block';
 
 		wp_register_script(
+			'motion-player-rive-wasm',
+			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/lib/rive-wasm.js',
+			array(),
+			self::RIVE_RUNTIME_VERSION,
+			true
+		);
+
+		wp_register_script(
 			'motion-player-rive-webgl2',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/lib/rive.js',
 			array(),
@@ -47,17 +55,9 @@ class Motion_Player_Rive_Block {
 		wp_register_script(
 			'motion-player-rive-runtime-config',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/rive-runtime-config.js',
-			array( 'motion-player-rive-webgl2' ),
+			array( 'motion-player-rive-webgl2', 'motion-player-rive-wasm' ),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
-		);
-
-		wp_localize_script(
-			'motion-player-rive-runtime-config',
-			'motionPlayerRiveConfig',
-			array(
-				'wasmUrl' => MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/lib/rive.wasm',
-			)
 		);
 
 		wp_register_script(
@@ -78,6 +78,7 @@ class Motion_Player_Rive_Block {
 				'wp-components',
 				'wp-block-editor',
 				'wp-data',
+				'motion-player-rive-wasm',
 				'motion-player-rive-webgl2',
 				'motion-player-rive-runtime-config',
 				'motion-player-rive-playback',
@@ -103,7 +104,7 @@ class Motion_Player_Rive_Block {
 		wp_register_script(
 			'motion-player-rive-view',
 			MOTION_PLAYER_RIVE_PLUGIN_URL . 'assets/view.js',
-			array( 'motion-player-rive-webgl2', 'motion-player-rive-runtime-config', 'motion-player-rive-playback' ),
+			array( 'motion-player-rive-wasm', 'motion-player-rive-webgl2', 'motion-player-rive-runtime-config', 'motion-player-rive-playback' ),
 			MOTION_PLAYER_RIVE_VERSION,
 			true
 		);

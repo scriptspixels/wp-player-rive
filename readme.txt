@@ -3,7 +3,7 @@ Tags: rive, animation, block, gutenberg, media
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,7 +39,7 @@ Yes. The block is registered for the block editor.
 
 = Where does the Rive runtime load from? =
 
-The plugin ships the official **@rive-app/webgl2** UMD bundle (`rive.js`) and its WebAssembly file (`rive.wasm`) inside the plugin. No remote JavaScript or CDN is required for playback.
+The plugin ships the official **@rive-app/webgl2** runtime (`rive.js`) and its WebAssembly payload (`rive-wasm.js`) inside the plugin. No remote JavaScript or CDN is required for playback.
 
 = Why WebGL2? =
 
@@ -57,6 +57,9 @@ No. Playback requires JavaScript and a browser with WebGL2 support.
 
 == Upgrade Notice ==
 
+= 0.1.2 =
+Embeds the Rive WebAssembly payload in JavaScript instead of shipping a `.wasm` file.
+
 = 0.1.1 =
 Bundles the Rive WebGL2 runtime locally (no CDN dependency).
 
@@ -64,6 +67,9 @@ Bundles the Rive WebGL2 runtime locally (no CDN dependency).
 Initial WordPress.org release of the free MotionPlayer for Rive block.
 
 == Changelog ==
+
+= 0.1.2 =
+* Embed the Rive WebAssembly binary in `rive-wasm.js` (WordPress.org does not permit `.wasm` files in plugin zips).
 
 = 0.1.1 =
 * Bundle the @rive-app/webgl2 runtime and WASM locally instead of loading from a CDN.

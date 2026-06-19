@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MotionPlayer for Rive
  * Description: Embed Rive (.riv) animations with a block. Free version: upload or pick a file from the media library.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: Scripts + Pixels
  * Author URI: https://scriptsandpixels.studio
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MOTION_PLAYER_RIVE_VERSION', '0.1.1' );
+define( 'MOTION_PLAYER_RIVE_VERSION', '0.1.2' );
 define( 'MOTION_PLAYER_RIVE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MOTION_PLAYER_RIVE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'MOTION_PLAYER_RIVE_PLUGIN_FILE', __FILE__ );
